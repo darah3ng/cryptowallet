@@ -25,6 +25,7 @@
         "jsxSingleQuote": true,
         "semi": true
       }
-    ]
+    ],
+    "react/prop-types": 0
   }
 }
