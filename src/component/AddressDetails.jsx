@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Card from './Card';
+import { Button, Typography as Typo } from '@supabase/ui';
+import { Input } from '@supabase/ui';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+import '../css/button.css';
+
+const useStyles = makeStyles(() => ({
+  root: {
+    flexGrow: 1,
+  },
+}));
 
 function AddressDetails() {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
+  const [walletAddress, setWalletAddress] = useState(null);
   const [state, setState] = useState({
     tokenName: '',
     address: '',
@@ -15,6 +28,15 @@ function AddressDetails() {
     interestEarned: '',
     gainPercent: '',
   });
+
+  const renderCard = () => {
+    const { tokenName } = state;
+    return !loading && !error && tokenName !== '';
+  };
+
+  const walletInput = (e) => {
+    setWalletAddress(e.target.value);
+  };
 
   const getAddressDetails = async (address, tokenAddress) => {
     setError(false);
@@ -83,63 +105,50 @@ function AddressDetails() {
     return [balanceResponse, txResponse];
   };
 
-  const yourAddress = process.env.REACT_APP_TEST_WALLET_ADDRESS;
+  const yourAddress = walletAddress;
   const tokenAddress = process.env.REACT_APP_TEST_TOKEN_ADDRESS;
-  const {
-    tokenName,
-    address,
-    balance,
-    tokensIn,
-    firstTransaction,
-    tokensOut,
-    netDeposits,
-    interestEarned,
-    gainPercent,
-  } = state;
+  const classes = useStyles();
 
   return (
-    <div>
-      <button
-        onClick={() => {
-          getAddressDetails(yourAddress, tokenAddress)
-            .then(() => {
-              setLoading(false);
-            })
-            .catch((e) => {
-              setLoading(false);
-              setError(e.response.data.error_message);
-            });
-        }}
-      >
-        On Click
-      </button>
-      <br />
+    <div className={classes.root}>
+      <Grid container style={{ marginBottom: '1rem' }}>
+        <Grid item xs={12} style={{ marginBottom: '0.5rem' }}>
+          <Typo.Text>wallet address</Typo.Text>
+        </Grid>
+        <Grid item xs={12} style={{ marginBottom: '0.5rem' }}>
+          <Input onChange={(e) => walletInput(e)} error={error} />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            style={{
+              borderRadius: '0.55rem',
+              maxHeight: '2rem',
+              width: '30%',
+              justifyContent: 'center',
+            }}
+            onClick={() => {
+              getAddressDetails(yourAddress, tokenAddress)
+                .then(() => {
+                  setLoading(false);
+                })
+                .catch((e) => {
+                  setLoading(false);
+                  setError(e.response?.data.error_message);
+                });
+            }}
+            loading={loading}
+          >
+            Show
+          </Button>
+        </Grid>
+      </Grid>
 
-      {error && !loading && <div>{error}</div>}
-
-      {loading && !error && <div>loading...</div>}
-
-      {!loading && !error && (
-        <div>
-          Token name: {tokenName}
-          <br />
-          Your wallet address: {address}
-          <br />
-          Balance: {balance}
-          <br />
-          Deposits: {tokensIn}
-          <br />
-          First transaction: {firstTransaction}
-          <br />
-          Withdrawals: {tokensOut}
-          <br />
-          Net deposits: {netDeposits}
-          <br />
-          Interest earned: {interestEarned}
-          <br />
-          Gain percent: {gainPercent}
-          <br />
-        </div>
+      {renderCard() && (
+        <Grid container>
+          <Grid container item xs={12}>
+            <Card {...state} />
+          </Grid>
+        </Grid>
       )}
     </div>
   );

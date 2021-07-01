@@ -1,0 +1,7 @@
+/*
+  - supabase ui comes with this class which wraps their button component
+  - this is an attmept to override the css class
+*/
+.sbui-btn-container {
+  display: block;
+}
