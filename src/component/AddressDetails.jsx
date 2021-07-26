@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Card from './Card';
-import { Button, Typography as Typo } from '@supabase/ui';
+import { Button, Typography as Typo, Select } from '@supabase/ui';
 import { Input } from '@supabase/ui';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
@@ -17,6 +17,7 @@ function AddressDetails() {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
+  const [tokenItems, setTokenItems] = useState(null);
   const [state, setState] = useState({
     tokenName: '',
     address: '',
@@ -36,6 +37,17 @@ function AddressDetails() {
 
   const walletInput = (e) => {
     setWalletAddress(e.target.value);
+  };
+
+  const handleSelect = (e) => {
+    getAddressDetails(walletAddress, e.target.value)
+      .then(() => {
+        setLoading(false);
+      })
+      .catch((e) => {
+        setLoading(false);
+        setError(e.response?.data.error_message);
+      });
   };
 
   const getAddressDetails = async (address, tokenAddress) => {
@@ -102,12 +114,21 @@ function AddressDetails() {
       gainPercent,
     });
 
+    setTokenItems(
+      balanceResponse.data.data.items.map((t) => ({
+        contractName: t.contract_name,
+        contractAddress: t.contract_address,
+      }))
+    );
+
     return [balanceResponse, txResponse];
   };
 
   const yourAddress = walletAddress;
-  const tokenAddress = process.env.REACT_APP_TEST_TOKEN_ADDRESS;
+  const tokenAddress = '0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3';
   const classes = useStyles();
+
+  console.log(tokenItems);
 
   return (
     <div className={classes.root}>
@@ -115,37 +136,53 @@ function AddressDetails() {
         <Grid item xs={12} style={{ marginBottom: '0.5rem' }}>
           <Typo.Text>wallet address</Typo.Text>
         </Grid>
-        <Grid item xs={12} style={{ marginBottom: '0.5rem' }}>
+        <Grid item xs={12} style={{ marginBottom: '1rem' }}>
           <Input onChange={(e) => walletInput(e)} error={error} />
         </Grid>
-        <Grid item xs={12}>
-          <Button
-            style={{
-              borderRadius: '0.55rem',
-              maxHeight: '2rem',
-              width: '30%',
-              justifyContent: 'center',
-            }}
-            onClick={() => {
-              getAddressDetails(yourAddress, tokenAddress)
-                .then(() => {
-                  setLoading(false);
-                })
-                .catch((e) => {
-                  setLoading(false);
-                  setError(e.response?.data.error_message);
-                });
-            }}
-            loading={loading}
-          >
-            Show
-          </Button>
-        </Grid>
+
+        {tokenItems && (
+          <Grid item xs={6}>
+            <Select onChange={handleSelect}>
+              {(tokenItems || []).map((t) => (
+                <Select.Option
+                  key={t.contractAddress}
+                  value={t.contractAddress}
+                >
+                  {t.contractName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Grid>
+        )}
+      </Grid>
+
+      <Grid item xs={12}>
+        <Button
+          style={{
+            borderRadius: '0.55rem',
+            maxHeight: '2rem',
+            width: '30%',
+            justifyContent: 'center',
+          }}
+          onClick={() => {
+            getAddressDetails(yourAddress, tokenAddress)
+              .then(() => {
+                setLoading(false);
+              })
+              .catch((e) => {
+                setLoading(false);
+                setError(e.response?.data.error_message);
+              });
+          }}
+          loading={loading}
+        >
+          Show
+        </Button>
       </Grid>
 
       {renderCard() && (
-        <Grid container>
-          <Grid container item xs={12}>
+        <Grid container style={{ marginTop: '1rem' }}>
+          <Grid item xs={12}>
             <Card {...state} />
           </Grid>
         </Grid>

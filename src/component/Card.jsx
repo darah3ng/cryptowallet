@@ -40,8 +40,6 @@ function CardHoverable({
 }) {
   const classes = useStyles();
 
-  console.log(balance);
-
   return (
     <Grid container>
       <Card hoverable className={classes.cardLayoutStyle}>
