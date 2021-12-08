@@ -161,7 +161,7 @@ function AddressDetails() {
           style={{
             borderRadius: '0.55rem',
             maxHeight: '2rem',
-            width: '30%',
+            width: '100%',
             justifyContent: 'center',
           }}
           onClick={() => {
