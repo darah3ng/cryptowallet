@@ -7,7 +7,7 @@
 - Interest earned features was implemented to support coins that have a tokenomic, such as, static rewards aka reflection.
 
 ## Requirement
-- Node installed
+- Node 16.13.0
 - Covalenthq API key is required. You can grab the key here 👉 https://www.covalenthq.com/
 - Once the API key is obtained, duplicate `.env.example` and rename it to `.env` and paste your key value there
 
