@@ -63,9 +63,12 @@ function AddressDetails() {
       ),
     ]);
 
-    const tokenBalance = balanceResponse.data.data.items.find(
-      (rm) => rm.contract_address === tokenAddress
-    );
+    // if no tokenAddress is specified, we grab the first one from the list
+    const tokenBalance = !tokenAddress
+      ? balanceResponse.data.data.items[0]
+      : balanceResponse.data.data.items.find(
+          (rm) => rm.contract_address === tokenAddress
+        );
 
     const tokenName = tokenBalance.contract_name;
     const decimals = tokenBalance.contract_decimals;
@@ -125,7 +128,7 @@ function AddressDetails() {
   };
 
   const yourAddress = walletAddress;
-  const tokenAddress = '0x8076c74c5e3f5852037f31ff0093eeb8c8add8d3';
+  const tokenAddress = '0x17d1285bc68d9085f8e4b86fc565e452b29dc48f';
   const classes = useStyles();
 
   console.log(tokenItems);
